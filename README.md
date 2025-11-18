@@ -1,17 +1,57 @@
 # Cross Project Asset Library
 
-A Unity Editor extension that provides a personal cross-project asset library, allowing developers to quickly import frequently used assets without manual folder navigation.
+A production-ready Unity Editor extension that provides a personal cross-project asset library, allowing developers to quickly import frequently used assets without manual folder navigation.
 
 **Package ID**: `com.crossproject.assetlibrary`
+**Version**: 1.0.0
+**Minimum Unity**: 2020.3 LTS
 
-## Features
+## Core Features
 
+### Asset Management
 - **Add Assets**: Right-click any asset in Unity → "Add to Asset Library" with metadata (group, tags, description, custom thumbnails)
-- **Browse Library**: Open library window to view all saved assets with previews
-- **Search & Filter**: Find assets by name, type, tags, or group
-- **Import Assets**: Click or drag-drop assets from library into current project
-- **Edit Metadata**: Modify asset properties (tags, group, description) within library
+- **Browse Library**: Open library window (Window → Asset Library) to view all saved assets with color-coded type indicators
+- **Multi-Select**: Ctrl+Click to select multiple assets for batch operations
+- **Batch Import**: Import multiple selected assets in one operation
+- **Batch Add**: Drag-and-drop multiple assets from Project window to library
+
+### Search & Filtering
+- **Name Search**: Real-time text search for assets (case-insensitive)
+- **Type Filter**: Filter by asset type (Textures, Prefabs, Scripts, Materials, Audio, Models, Animations, Shaders, and more)
+- **Tag Filter**: Filter by tags (supports multi-tag filtering)
+- **Group Filter**: Organize and filter by category/group
+- **Combined Filtering**: Use multiple filters simultaneously for precise asset discovery
+
+### Asset Editing & Preview
+- **Edit Metadata**: Modify asset properties (name, tags, group, description) directly within library
+- **Asset Preview Window**:
+  - Texture preview with zoom and rotation controls
+  - Audio clip playback with visualization
+  - 3D mesh preview with rotation/zoom
+  - Text file preview with syntax highlighting
+  - Metadata panel display
+- **Asset Properties Dialog**: View complete asset information (ID, path, size, date added, etc.)
+- **Context Menu Options**:
+  - Open with system default application
+  - Export asset to folder
+  - Copy asset path to clipboard
+  - Reveal library file in file explorer
+  - Delete asset from library
+  - Show properties
+
+### Library Management
+- **Create Libraries**: Create new .unitylib files via dialog wizard
 - **Portable Format**: Libraries stored as `.unitylib` files (ZIP-based) for easy backup and sharing
+- **Recent Libraries**: Quick-access to recently used libraries with metadata (asset count, last modified)
+- **File System Monitoring**: Auto-reload detection when library files change externally
+- **Library Validation**: Auto-validates paths, removes deleted libraries from history
+
+### Import & Integration
+- **Smart Import**: Import button with automatic destination folder selection
+- **Drag-and-Drop Import**: Drag assets from library window directly into Project window
+- **Duplicate Handling**: Automatically handles filename conflicts during import
+- **Default Location**: Imports to `Assets/Imported/` folder (customizable)
+- **Asset Database Integration**: Automatic refresh after import
 
 ## Installation
 
@@ -94,17 +134,17 @@ The tool stores the following preferences (accessible via `EditorPrefs`):
 - `CPAM.DefaultImportPath`: Default folder for importing assets
 - `CPAM.WindowPosition`: Window position and size
 
-## Limitations (MVP Scope)
+## Current Limitations
 
-The current version does NOT support:
+The current version (1.0.0) does NOT support:
 
 - ❌ Cloud sync or remote storage
 - ❌ Team collaboration features
 - ❌ Asset versioning or update detection
-- ❌ Dependency tracking between assets
-- ❌ Multiple library support (open one library at a time)
+- ❌ Automatic dependency tracking between assets
+- ❌ Simultaneous multiple library support (single library open at a time)
 - ❌ Library encryption or protection
-- ❌ Asset deletion UI (API available via `LibraryEditor.DeleteAssetFromLibrary()` for programmatic deletion)
+- ❌ GUID preservation on import (new GUIDs assigned automatically)
 
 ## Technical Details
 
@@ -159,6 +199,6 @@ For issues, questions, or suggestions, please refer to the project repository or
 
 ---
 
-**Version**: 0.1.0
+**Version**: 1.0.0
 **Unity Version**: 2020.3 LTS and newer
-**Platform Support**: Windows, macOS, Linux
+**Platform Support**: Windows, macOS, Linux (Editor only)

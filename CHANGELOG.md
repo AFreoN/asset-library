@@ -5,6 +5,82 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2025-11-18
+
+### Added
+
+- **Recent Libraries Management**:
+  - Dedicated Recent Libraries window showing MRU (Most Recently Used) libraries
+  - Library metadata caching (asset count, last modified, last accessed timestamps)
+  - Quick-access button in main window for browsing recent libraries
+  - Auto-validation and removal of deleted libraries from history
+  - Legacy EditorPrefs migration support
+
+- **Enhanced Asset Preview Window**:
+  - Texture preview with zoom and rotation controls
+  - Audio clip playback with waveform visualization
+  - 3D mesh preview with rotation and zoom
+  - Text file preview with syntax highlighting (50K character limit)
+  - PreviewRenderUtility integration for advanced asset rendering
+  - Metadata panel display alongside previews
+
+- **Improved Window Layout**:
+  - Optimized main window and library selection UI
+  - Better asset grid layout with dynamic column calculation
+  - Responsive filtering and search interface
+  - Color-coded asset type indicators (13 distinct type colors)
+
+- **File System Monitoring**:
+  - FileSystemWatcher integration for auto-reload detection
+  - Real-time library change detection
+  - Automatic UI refresh when library files are modified externally
+
+- **Asset Operations**:
+  - Context menu: "Open with system default application"
+  - Context menu: "Export asset to folder"
+  - Context menu: "Copy asset path to clipboard"
+  - Context menu: "Reveal library file in file explorer"
+  - Delete asset from library with confirmation dialog
+  - Read-only Asset Properties dialog showing all metadata
+  - In-library asset metadata editing (name, group, tags, description)
+
+- **Drag and Drop Enhancements**:
+  - Drag-and-drop from project to library for asset batch addition
+  - Temporary file extraction for drag-drop operations
+  - Automatic temp file cleanup after operations
+
+- **Release Infrastructure**:
+  - GitHub Actions workflow for automated releases
+  - Comprehensive release documentation and guides
+  - Semantic versioning and changelog management tools
+
+### Changed
+
+- Consolidated recent library tracking into dedicated RecentLibrariesManager singleton
+- Improved asset metadata aggregation for filtering operations
+- Enhanced window position/size persistence via EditorPrefs
+- Separated MRU management from core library loading logic
+- Optimized thumbnail caching system in main window
+
+### Fixed
+
+- Asset deletion now properly removes both asset files and thumbnails
+- Window state properly persists across editor sessions
+- Duplicate filename handling improved during batch imports
+- Recent libraries list properly validates paths on load
+
+### Technical Details
+
+- **Total Script Files**: 19 organized in 4 architectural layers
+- **Total Code**: ~3,500+ lines of C# across data, core, UI, and utilities layers
+- **Assembly Definition**: com.crossproject.assetlibrary.asmdef (Editor only)
+- **Design Patterns**: Singleton (RecentLibrariesManager), MVC separation, modal dialogs, progress indication
+- **Performance**: Thumbnail caching, metadata aggregation, efficient filtering
+
+### Removed
+
+- Legacy single-library EditorPrefs tracking (migrated to RecentLibrariesManager)
+
 ## [0.1.0] - 2025-10-25
 
 ### Added
