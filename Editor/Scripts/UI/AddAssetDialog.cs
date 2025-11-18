@@ -27,8 +27,17 @@ namespace CPAM
 
         private void OnEnable()
         {
-            // Load last used library from EditorPrefs
-            _libraryPath = EditorPrefs.GetString(LastLibraryPathKey, "");
+            // Try to load from shared recent libraries manager first
+            var recentLibraries = RecentLibrariesManager.Instance.GetRecentLibraries();
+            if (recentLibraries.Count > 0)
+            {
+                _libraryPath = recentLibraries[0].path;
+            }
+            else
+            {
+                // Fallback to legacy key for backward compatibility
+                _libraryPath = EditorPrefs.GetString(LastLibraryPathKey, "");
+            }
         }
 
         /// <summary>
@@ -96,6 +105,11 @@ namespace CPAM
                 {
                     _libraryPath = path;
                 }
+            }
+
+            if (GUILayout.Button("Recent", GUILayout.Width(60)))
+            {
+                RecentLibrariesDialog.ShowDialog(OnRecentLibrarySelected);
             }
 
             EditorGUILayout.EndHorizontal();
@@ -203,7 +217,10 @@ namespace CPAM
 
                 if (success)
                 {
-                    // Save library path for next time
+                    // Register library usage in shared manager
+                    RecentLibrariesManager.Instance.RegisterLibraryUsage(_libraryPath);
+
+                    // Keep legacy key for backward compatibility
                     EditorPrefs.SetString(LastLibraryPathKey, _libraryPath);
 
                     EditorUtility.DisplayDialog("Success", $"Successfully added {_selectedAssets.Count} asset(s) to library!", "OK");
@@ -241,6 +258,14 @@ namespace CPAM
             }
 
             return tags;
+        }
+
+        /// <summary>
+        /// Callback when a library is selected from the Recent Libraries dialog.
+        /// </summary>
+        private void OnRecentLibrarySelected(string libraryPath)
+        {
+            _libraryPath = libraryPath;
         }
 
         private void OnDestroy()

@@ -178,6 +178,11 @@ namespace CPAM
                 CreateNewLibraryDialog.ShowDialog();
             }
 
+            if (GUILayout.Button("Show All", EditorStyles.toolbarButton, GUILayout.Width(70)))
+            {
+                RecentLibrariesDialog.ShowDialog(OnRecentLibrarySelected);
+            }
+
             GUILayout.FlexibleSpace();
 
             EditorGUILayout.LabelField("Auto Reload:", GUILayout.Width(75));
@@ -665,6 +670,9 @@ namespace CPAM
                     EditorUtility.DisplayProgressBar("Loading Library", "Loading thumbnails...", 0.8f);
                     PreloadThumbnails();
 
+                    // Register library usage in recent libraries manager
+                    RecentLibrariesManager.Instance.RegisterLibraryUsage(libraryPath);
+
                     // Setup file watcher if auto-reload is enabled
                     SetupFileWatcher();
                 }
@@ -677,6 +685,15 @@ namespace CPAM
             {
                 EditorUtility.ClearProgressBar();
             }
+        }
+
+        /// <summary>
+        /// Callback when a library is selected from the Recent Libraries dialog.
+        /// </summary>
+        private void OnRecentLibrarySelected(string libraryPath)
+        {
+            _libraryPath = libraryPath;
+            LoadLibrary(libraryPath);
         }
 
         private void SetupFileWatcher()
