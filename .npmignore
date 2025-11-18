@@ -1,0 +1,34 @@
+# Git and version control
+.git
+.gitignore
+.gitattributes
+.github
+
+# Development & Release documentation (not needed for end users)
+CHANGELOG.md
+CONTRIBUTING.md
+INSTALL.md
+RELEASING.md
+QUICKSTART_RELEASE.md
+CLAUDE.md
+
+# Documentation summaries and guides
+RELEASE_SUMMARY.txt
+RELEASE_WORKFLOW.txt
+VERSION_UPDATE_SUMMARY.txt
+
+# Development files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDEs
+.vscode/
+.idea/
+*.code-workspace
+
+# Documentation folder
+docs/
+docs/**

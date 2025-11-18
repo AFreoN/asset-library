@@ -1,0 +1,44 @@
+# Development & Release documentation - exclude from distribution
+CHANGELOG.md export-ignore
+CONTRIBUTING.md export-ignore
+INSTALL.md export-ignore
+RELEASING.md export-ignore
+QUICKSTART_RELEASE.md export-ignore
+CLAUDE.md export-ignore
+
+# Summary files - exclude from distribution
+RELEASE_SUMMARY.txt export-ignore
+RELEASE_WORKFLOW.txt export-ignore
+VERSION_UPDATE_SUMMARY.txt export-ignore
+
+# Documentation summaries meta files
+RELEASE_SUMMARY.txt.meta export-ignore
+RELEASE_WORKFLOW.txt.meta export-ignore
+VERSION_UPDATE_SUMMARY.txt.meta export-ignore
+
+# Development documentation folder - exclude from distribution
+docs/ export-ignore
+docs/** export-ignore
+
+# GitHub workflows - exclude from distribution
+.github/ export-ignore
+.github/** export-ignore
+
+# Git configuration files
+.gitattributes export-ignore
+.gitignore export-ignore
+.npmignore export-ignore
+
+# Development & IDE files - exclude from distribution
+.DS_Store export-ignore
+Thumbs.db export-ignore
+*.swp export-ignore
+*.swo export-ignore
+*~ export-ignore
+.vscode/ export-ignore
+.idea/ export-ignore
+*.code-workspace export-ignore
+
+# Keep these files for end users
+LICENSE.md diff=markdown
+README.md diff=markdown
