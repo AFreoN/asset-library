@@ -153,7 +153,8 @@ namespace CPAM
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
             EditorGUILayout.LabelField("Library:", GUILayout.Width(50));
-            _libraryPath = EditorGUILayout.TextField(_libraryPath);
+            string libraryName = string.IsNullOrEmpty(_libraryPath) ? "None" : Path.GetFileNameWithoutExtension(_libraryPath);
+            EditorGUILayout.LabelField(libraryName, GUILayout.Width(150));
 
             if (GUILayout.Button("Browse", EditorStyles.toolbarButton, GUILayout.Width(60)))
             {
@@ -162,14 +163,6 @@ namespace CPAM
                 {
                     _libraryPath = path;
                     LoadLibrary(path);
-                }
-            }
-
-            if (GUILayout.Button("Reload", EditorStyles.toolbarButton, GUILayout.Width(60)))
-            {
-                if (!string.IsNullOrEmpty(_libraryPath))
-                {
-                    LoadLibrary(_libraryPath);
                 }
             }
 
@@ -184,6 +177,14 @@ namespace CPAM
             }
 
             GUILayout.FlexibleSpace();
+
+            if (GUILayout.Button("Reload", EditorStyles.toolbarButton, GUILayout.Width(60)))
+            {
+                if (!string.IsNullOrEmpty(_libraryPath))
+                {
+                    LoadLibrary(_libraryPath);
+                }
+            }
 
             EditorGUILayout.LabelField("Auto Reload:", GUILayout.Width(75));
             var newAutoReload = EditorGUILayout.Toggle(_autoReload, GUILayout.Width(20));

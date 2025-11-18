@@ -16,8 +16,9 @@ namespace CPAM
         private RecentLibrariesManager.LibraryMetadata _selectedLibrary = null;
         private bool _isLoadingData = false;
 
-        private GUIStyle _listItemStyle;
-        private GUIStyle _selectedItemStyle;
+        private GUIStyle _headerStyle;
+        private GUIStyle _rowStyle;
+        private GUIStyle _selectedRowStyle;
 
         public delegate void OnLibrarySelectedDelegate(string libraryPath);
         private static OnLibrarySelectedDelegate _onLibrarySelected;
@@ -82,8 +83,10 @@ namespace CPAM
 
             InitializeStyles();
 
-            EditorGUILayout.LabelField("Click to select, double-click to open:", EditorStyles.miniLabel);
+            // Draw table header
+            DrawTableHeader();
 
+            // Draw scrollable list
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
 
             for (int i = 0; i < _libraries.Count; i++)
@@ -95,83 +98,124 @@ namespace CPAM
         }
 
         /// <summary>
+        /// Draw the table header with column labels.
+        /// </summary>
+        private void DrawTableHeader()
+        {
+            Rect headerRect = GUILayoutUtility.GetRect(0, 24, GUILayout.ExpandWidth(true));
+
+            // Draw header background
+            GUI.color = EditorGUIUtility.isProSkin ? new Color(0.12f, 0.12f, 0.12f) : new Color(0.9f, 0.9f, 0.9f);
+            GUI.DrawTexture(headerRect, EditorGUIUtility.whiteTexture, ScaleMode.StretchToFill);
+            GUI.color = Color.white;
+
+            // Draw header text
+            EditorGUI.LabelField(new Rect(headerRect.x + 10, headerRect.y, 200, headerRect.height), "Name", EditorStyles.boldLabel);
+            EditorGUI.LabelField(new Rect(headerRect.x + 220, headerRect.y, 80, headerRect.height), "Assets", EditorStyles.boldLabel);
+            EditorGUI.LabelField(new Rect(headerRect.x + 310, headerRect.y, 120, headerRect.height), "Accessed", EditorStyles.boldLabel);
+            EditorGUI.LabelField(new Rect(headerRect.x + headerRect.width - 180, headerRect.y, 170, headerRect.height), "Actions", EditorStyles.boldLabel);
+
+            // Draw separator
+            GUI.color = EditorGUIUtility.isProSkin ? new Color(0.3f, 0.3f, 0.3f) : new Color(0.7f, 0.7f, 0.7f);
+            GUI.DrawTexture(new Rect(headerRect.x, headerRect.y + headerRect.height - 1, headerRect.width, 1), EditorGUIUtility.whiteTexture);
+            GUI.color = Color.white;
+        }
+
+        /// <summary>
         /// Draw a single library item in the list.
         /// </summary>
         private void DrawLibraryItem(RecentLibrariesManager.LibraryMetadata metadata, int index)
         {
-            Rect itemRect = GUILayoutUtility.GetRect(0, 60, GUILayout.ExpandWidth(true));
+            Rect itemRect = GUILayoutUtility.GetRect(0, 32, GUILayout.ExpandWidth(true));
 
             // Selection highlight
             bool isSelected = (_selectedLibrary != null && _selectedLibrary.path == metadata.path);
             if (isSelected)
             {
-                GUI.DrawTexture(itemRect, EditorGUIUtility.whiteTexture, ScaleMode.StretchToFill);
-                GUI.color = EditorGUIUtility.isProSkin ? new Color(0.2f, 0.5f, 0.8f) : new Color(0.3f, 0.6f, 0.9f);
+                GUI.color = EditorGUIUtility.isProSkin ? new Color(0.2f, 0.5f, 0.8f) : new Color(0.7f, 0.85f, 1f);
                 GUI.DrawTexture(itemRect, EditorGUIUtility.whiteTexture, ScaleMode.StretchToFill);
                 GUI.color = Color.white;
             }
 
-            // Handle click events
+            // Alternate row colors for better readability
+            if (index % 2 == 0)
+            {
+                GUI.color = EditorGUIUtility.isProSkin ? new Color(0.16f, 0.16f, 0.16f) : new Color(0.95f, 0.95f, 0.95f);
+                GUI.DrawTexture(itemRect, EditorGUIUtility.whiteTexture, ScaleMode.StretchToFill);
+                GUI.color = Color.white;
+            }
+
+            // Right-side action buttons
+            float buttonWidth = 75;
+            float spacing = 5;
+            float startX = itemRect.x + itemRect.width - (buttonWidth * 2 + spacing) - 10;
+
+            // Define button rects first for click detection
+            Rect revealButtonRect = new Rect(startX, itemRect.y + 6, buttonWidth, 20);
+            Rect removeButtonRect = new Rect(startX + buttonWidth + spacing, itemRect.y + 6, buttonWidth, 20);
+
+            // Handle click events on the row (but not on buttons)
             if (itemRect.Contains(Event.current.mousePosition))
             {
-                if (Event.current.type == EventType.MouseDown)
+                // Check if click is NOT on any button
+                if (!revealButtonRect.Contains(Event.current.mousePosition) &&
+                    !removeButtonRect.Contains(Event.current.mousePosition))
                 {
-                    _selectedLibrary = metadata;
-                    Event.current.Use();
-
-                    // Double-click to open
-                    if (Event.current.clickCount == 2)
+                    if (Event.current.type == EventType.MouseDown)
                     {
-                        OpenSelectedLibrary();
+                        _selectedLibrary = metadata;
+                        Event.current.Use();
+
+                        // Double-click to open
+                        if (Event.current.clickCount == 2)
+                        {
+                            OpenSelectedLibrary();
+                        }
                     }
                 }
             }
 
-            // Draw content
-            EditorGUI.indentLevel++;
-
-            Rect contentRect = new Rect(itemRect.x + 10, itemRect.y + 5, itemRect.width - 120, itemRect.height - 10);
-
             // Library name
             EditorGUI.LabelField(
-                new Rect(contentRect.x, contentRect.y, contentRect.width, 18),
+                new Rect(itemRect.x + 10, itemRect.y + 8, 200, 16),
                 metadata.libraryName,
-                EditorStyles.boldLabel
+                EditorStyles.label
             );
 
             // Asset count
             EditorGUI.LabelField(
-                new Rect(contentRect.x, contentRect.y + 18, contentRect.width, 14),
-                $"Assets: {metadata.assetCount}",
+                new Rect(itemRect.x + 220, itemRect.y + 8, 80, 16),
+                $"{metadata.assetCount}",
                 EditorStyles.miniLabel
             );
 
             // Last accessed
             EditorGUI.LabelField(
-                new Rect(contentRect.x, contentRect.y + 32, contentRect.width, 14),
-                $"Accessed: {FormatDateTime(metadata.lastAccessed)}",
+                new Rect(itemRect.x + 310, itemRect.y + 8, 120, 16),
+                FormatDateTime(metadata.lastAccessed),
                 EditorStyles.miniLabel
             );
 
-            // File path
-            EditorGUI.LabelField(
-                new Rect(contentRect.x, contentRect.y + 46, contentRect.width, 12),
-                metadata.path,
-                EditorStyles.miniLabel
-            );
+            // Reveal button
+            if (GUI.Button(revealButtonRect, "Reveal"))
+            {
+                RevealLibraryInExplorer(metadata.path);
+                Event.current.Use();
+            }
 
-            EditorGUI.indentLevel--;
-
-            // Right-side buttons
-            Rect buttonRect = new Rect(itemRect.x + itemRect.width - 110, itemRect.y + 15, 100, 20);
-
-            if (GUI.Button(buttonRect, "Remove"))
+            // Remove button
+            if (GUI.Button(removeButtonRect, "Remove"))
             {
                 RecentLibrariesManager.Instance.RemoveLibrary(metadata.path);
                 RefreshLibraryList();
                 Event.current.Use();
                 return;
             }
+
+            // Draw bottom border
+            GUI.color = EditorGUIUtility.isProSkin ? new Color(0.2f, 0.2f, 0.2f) : new Color(0.8f, 0.8f, 0.8f);
+            GUI.DrawTexture(new Rect(itemRect.x, itemRect.y + itemRect.height - 1, itemRect.width, 1), EditorGUIUtility.whiteTexture);
+            GUI.color = Color.white;
         }
 
         /// <summary>
@@ -235,18 +279,74 @@ namespace CPAM
         /// </summary>
         private void InitializeStyles()
         {
-            if (_listItemStyle == null)
+            if (_headerStyle == null)
             {
-                _listItemStyle = new GUIStyle(GUI.skin.box)
+                _headerStyle = new GUIStyle(EditorStyles.label)
                 {
-                    padding = new RectOffset(10, 10, 5, 5),
-                    margin = new RectOffset(0, 0, 2, 2)
+                    fontStyle = FontStyle.Bold
                 };
 
-                _selectedItemStyle = new GUIStyle(_listItemStyle)
+                _rowStyle = new GUIStyle(EditorStyles.label)
+                {
+                    padding = new RectOffset(10, 10, 0, 0)
+                };
+
+                _selectedRowStyle = new GUIStyle(_rowStyle)
                 {
                     normal = { background = EditorGUIUtility.whiteTexture }
                 };
+            }
+        }
+
+        /// <summary>
+        /// Reveal the library file in the system file explorer.
+        /// </summary>
+        private void RevealLibraryInExplorer(string libraryPath)
+        {
+            if (string.IsNullOrEmpty(libraryPath) || !File.Exists(libraryPath))
+            {
+                EditorUtility.DisplayDialog("Error", "Library file not found: " + libraryPath, "OK");
+                return;
+            }
+
+            try
+            {
+                #if UNITY_EDITOR_WIN
+                    // On Windows, use explorer /select with proper path escaping
+                    System.Diagnostics.ProcessStartInfo psi = new System.Diagnostics.ProcessStartInfo()
+                    {
+                        FileName = "explorer.exe",
+                        Arguments = "/select,\"" + libraryPath.Replace("/", "\\") + "\"",
+                        UseShellExecute = true
+                    };
+                    System.Diagnostics.Process.Start(psi);
+                #elif UNITY_EDITOR_OSX
+                    // On macOS, use open -R
+                    System.Diagnostics.ProcessStartInfo psi = new System.Diagnostics.ProcessStartInfo()
+                    {
+                        FileName = "open",
+                        Arguments = "-R \"" + libraryPath + "\"",
+                        UseShellExecute = false
+                    };
+                    System.Diagnostics.Process.Start(psi);
+                #elif UNITY_EDITOR_LINUX
+                    // For Linux, open the folder
+                    string folder = System.IO.Path.GetDirectoryName(libraryPath);
+                    System.Diagnostics.ProcessStartInfo psi = new System.Diagnostics.ProcessStartInfo()
+                    {
+                        FileName = "xdg-open",
+                        Arguments = "\"" + folder + "\"",
+                        UseShellExecute = false
+                    };
+                    System.Diagnostics.Process.Start(psi);
+                #endif
+
+                LibraryUtilities.Log("Revealing library: " + libraryPath);
+            }
+            catch (System.Exception ex)
+            {
+                EditorUtility.DisplayDialog("Error", "Failed to open file explorer: " + ex.Message, "OK");
+                LibraryUtilities.LogError("Failed to reveal library in explorer: " + ex.Message);
             }
         }
 
