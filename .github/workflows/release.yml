@@ -1,0 +1,58 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Parse version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$GITHUB_REF" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Extract changelog for this version from CHANGELOG.md
+          VERSION=${{ steps.version.outputs.version }}
+
+          # Find the section for this version in CHANGELOG.md
+          CHANGELOG=$(sed -n "/^## \[$VERSION\]/,/^## \[/p" CHANGELOG.md | sed '$d')
+
+          # If changelog section not found, use generic message
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="See CHANGELOG.md for changes in this release."
+          fi
+
+          # Store changelog in a file (GitHub has output size limits)
+          echo "$CHANGELOG" > changelog_release.txt
+          echo "changelog_file=changelog_release.txt" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          name: Cross Project Asset Library ${{ steps.version.outputs.version }}
+          body_path: ${{ steps.changelog.outputs.changelog_file }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup
+        if: always()
+        run: rm -f changelog_release.txt
