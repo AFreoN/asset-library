@@ -30,6 +30,10 @@ namespace CPAL
         private FileSystemWatcher _fileWatcher;
         private bool _needsReload = false;
 
+        // Thumbnail loading
+        private Queue<string> _pendingThumbnailQueue;
+        private int _thumbnailLoadBatchSize = 3; // Load 3 thumbnails per frame (main thread, batched to prevent UI freeze)
+
         // Asset type colors for placeholders
         private static readonly Dictionary<string, Color> AssetTypeColors = new Dictionary<string, Color>
         {
@@ -59,6 +63,11 @@ namespace CPAL
         private Dictionary<string, Texture2D> _thumbnailCache;
         private bool _isLoadingThumbnails = false;
 
+        // Filter cache (rebuilt only when library changes)
+        private List<string> _cachedTypesList;
+        private List<string> _cachedTagsList;
+        private List<string> _cachedGroupsList;
+
         // Asset card rendering
         private struct AssetCard
         {
@@ -80,6 +89,12 @@ namespace CPAL
             _displayedAssets = new List<AssetMetadata>();
             _selectedAssetIds = new HashSet<string>();
             _thumbnailCache = new Dictionary<string, Texture2D>();
+            _pendingThumbnailQueue = new Queue<string>();
+
+            // Initialize filter caches
+            _cachedTypesList = new List<string> { "All Types" };
+            _cachedTagsList = new List<string> { "All Tags" };
+            _cachedGroupsList = new List<string> { "All Groups" };
 
             // Load last used library path from preferences
             _libraryPath = EditorPrefs.GetString("CPAL.LastLibraryPath", "");
@@ -117,6 +132,9 @@ namespace CPAL
         {
             // Check if we should clean up old drag-drop temp files
             CleanupOldDragTempFilesIfNeeded();
+
+            // Process thumbnail loading (limited per frame to prevent UI freeze)
+            ProcessThumbnailLoading();
 
             // Handle auto-reload if needed
             if (_needsReload && _autoReload)
@@ -239,45 +257,39 @@ namespace CPAL
 
             EditorGUILayout.BeginHorizontal();
 
-            // Type filter
+            // Type filter (using cached list)
             EditorGUILayout.LabelField("Type:", GUILayout.Width(50));
-            var types = new List<string> { "All Types" };
-            types.AddRange(_loader.GetAssetTypes().OrderBy(t => t));
-            var typeIndex = types.IndexOf(_selectedTypeFilter);
+            var typeIndex = _cachedTypesList.IndexOf(_selectedTypeFilter);
             if (typeIndex < 0) typeIndex = 0;
 
-            var newTypeIndex = EditorGUILayout.Popup(typeIndex, types.ToArray());
-            var newTypeFilter = types[newTypeIndex];
+            var newTypeIndex = EditorGUILayout.Popup(typeIndex, _cachedTypesList.ToArray());
+            var newTypeFilter = _cachedTypesList[newTypeIndex];
             if (newTypeFilter != _selectedTypeFilter)
             {
                 _selectedTypeFilter = newTypeFilter;
                 RefreshDisplayedAssets();
             }
 
-            // Tag filter
+            // Tag filter (using cached list)
             EditorGUILayout.LabelField("Tag:", GUILayout.Width(40));
-            var tags = new List<string> { "All Tags" };
-            tags.AddRange(_loader.GetTags().OrderBy(t => t));
-            var tagIndex = tags.IndexOf(_selectedTagFilter);
+            var tagIndex = _cachedTagsList.IndexOf(_selectedTagFilter);
             if (tagIndex < 0) tagIndex = 0;
 
-            var newTagIndex = EditorGUILayout.Popup(tagIndex, tags.ToArray());
-            var newTagFilter = tags[newTagIndex];
+            var newTagIndex = EditorGUILayout.Popup(tagIndex, _cachedTagsList.ToArray());
+            var newTagFilter = _cachedTagsList[newTagIndex];
             if (newTagFilter != _selectedTagFilter)
             {
                 _selectedTagFilter = newTagFilter;
                 RefreshDisplayedAssets();
             }
 
-            // Group filter
+            // Group filter (using cached list)
             EditorGUILayout.LabelField("Group:", GUILayout.Width(45));
-            var groups = new List<string> { "All Groups" };
-            groups.AddRange(_loader.GetGroups().OrderBy(g => g));
-            var groupIndex = groups.IndexOf(_selectedGroupFilter);
+            var groupIndex = _cachedGroupsList.IndexOf(_selectedGroupFilter);
             if (groupIndex < 0) groupIndex = 0;
 
-            var newGroupIndex = EditorGUILayout.Popup(groupIndex, groups.ToArray());
-            var newGroupFilter = groups[newGroupIndex];
+            var newGroupIndex = EditorGUILayout.Popup(groupIndex, _cachedGroupsList.ToArray());
+            var newGroupFilter = _cachedGroupsList[newGroupIndex];
             if (newGroupFilter != _selectedGroupFilter)
             {
                 _selectedGroupFilter = newGroupFilter;
@@ -285,6 +297,22 @@ namespace CPAL
             }
 
             EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// Rebuild the filter dropdown caches.
+        /// Called when the library is loaded or reloaded.
+        /// </summary>
+        private void RebuildFilterCaches()
+        {
+            _cachedTypesList = new List<string> { "All Types" };
+            _cachedTypesList.AddRange(_loader.GetAssetTypes().OrderBy(t => t));
+
+            _cachedTagsList = new List<string> { "All Tags" };
+            _cachedTagsList.AddRange(_loader.GetTags().OrderBy(t => t));
+
+            _cachedGroupsList = new List<string> { "All Groups" };
+            _cachedGroupsList.AddRange(_loader.GetGroups().OrderBy(g => g));
         }
 
         private void DrawAssetGrid()
@@ -358,12 +386,16 @@ namespace CPAL
             // Restore original color for content
             GUI.backgroundColor = originalBgColor;
 
-            // Get or load thumbnail
+            // Get or queue thumbnail
             Texture2D thumbnail = null;
             if (!_thumbnailCache.TryGetValue(asset.id, out thumbnail))
             {
-                thumbnail = LoadThumbnail(asset);
-                _thumbnailCache[asset.id] = thumbnail;
+                // Queue thumbnail for loading if not already queued
+                if (!_pendingThumbnailQueue.Contains(asset.id))
+                {
+                    _pendingThumbnailQueue.Enqueue(asset.id);
+                }
+                // Placeholder will be shown while loading
             }
 
             // Draw thumbnail (clickable, draggable)
@@ -524,7 +556,42 @@ namespace CPAL
             GUI.backgroundColor = originalBgColor;
         }
 
-        private Texture2D LoadThumbnail(AssetMetadata asset)
+        /// <summary>
+        /// Process thumbnail loading queue - loads up to thumbnailLoadBatchSize per frame
+        /// on the main thread to prevent UI stuttering. Batching prevents freezing.
+        /// </summary>
+        private void ProcessThumbnailLoading()
+        {
+            // Load up to batch size thumbnails this frame
+            int loadedThisFrame = 0;
+            while (_pendingThumbnailQueue.Count > 0 && loadedThisFrame < _thumbnailLoadBatchSize)
+            {
+                var assetId = _pendingThumbnailQueue.Dequeue();
+                var asset = _loader.GetAssetById(assetId);
+
+                if (asset != null && !string.IsNullOrEmpty(asset.thumbnailPath))
+                {
+                    try
+                    {
+                        var thumbnailData = _loader.GetAssetThumbnail(asset);
+                        if (thumbnailData != null && thumbnailData.Length > 0)
+                        {
+                            var texture = new Texture2D(1, 1);
+                            texture.LoadImage(thumbnailData);
+                            _thumbnailCache[assetId] = texture;
+                            Repaint(); // Request repaint when thumbnail loads
+                            loadedThisFrame++;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LibraryUtilities.LogWarning($"Failed to load thumbnail for asset {assetId}: {ex.Message}");
+                    }
+                }
+            }
+        }
+
+        private Texture2D LoadThumbnailSync(AssetMetadata asset)
         {
             if (string.IsNullOrEmpty(asset.thumbnailPath))
             {
@@ -667,6 +734,10 @@ namespace CPAL
                 {
                     EditorPrefs.SetString("CPAL.LastLibraryPath", libraryPath);
                     _selectedAssetIds.Clear();
+
+                    // Rebuild filter caches when library is loaded
+                    RebuildFilterCaches();
+
                     RefreshDisplayedAssets();
                     EditorUtility.DisplayProgressBar("Loading Library", "Loading thumbnails...", 0.8f);
                     PreloadThumbnails();
@@ -773,13 +844,13 @@ namespace CPAL
 
         private void PreloadThumbnails()
         {
-            // Simple preload: load first few thumbnails
+            // Queue first few thumbnails for async loading
             for (int i = 0; i < Mathf.Min(9, _displayedAssets.Count); i++)
             {
                 var asset = _displayedAssets[i];
-                if (!_thumbnailCache.ContainsKey(asset.id))
+                if (!_thumbnailCache.ContainsKey(asset.id) && !_pendingThumbnailQueue.Contains(asset.id))
                 {
-                    _thumbnailCache[asset.id] = LoadThumbnail(asset);
+                    _pendingThumbnailQueue.Enqueue(asset.id);
                 }
             }
         }

@@ -9,6 +9,7 @@ namespace CPAL
     /// <summary>
     /// Handles loading and caching of asset libraries.
     /// Manages extraction, manifest parsing, and asset access.
+    /// Supports both traditional extraction-based loading and lazy ZIP-based loading.
     /// </summary>
     public class AssetLibraryLoader
     {
@@ -19,6 +20,7 @@ namespace CPAL
 
         /// <summary>
         /// The path to the extracted library contents in the temporary cache.
+        /// Only set when using extraction-based loading.
         /// </summary>
         public string ExtractedPath { get; private set; }
 
@@ -32,6 +34,9 @@ namespace CPAL
         /// </summary>
         public bool IsLoaded { get; private set; }
 
+        // Lazy loading support
+        private LazyZipLibraryReader _lazyReader;
+        private bool _useLazyLoading = true; // Use lazy loading by default for better performance
         private bool _disposed = false;
 
         public AssetLibraryLoader()
@@ -40,6 +45,8 @@ namespace CPAL
 
         /// <summary>
         /// Load a library from a .unitylib file.
+        /// Attempts lazy ZIP-based loading first for better performance on large libraries.
+        /// Falls back to traditional extraction-based loading if lazy loading fails.
         /// </summary>
         public bool LoadLibrary(string libraryPath)
         {
@@ -58,7 +65,26 @@ namespace CPAL
                     return false;
                 }
 
-                // Extract library
+                // Try lazy loading first (better performance, no full extraction)
+                if (_useLazyLoading)
+                {
+                    _lazyReader = LazyZipLibraryReader.Open(libraryPath);
+                    if (_lazyReader != null)
+                    {
+                        LibraryPath = libraryPath;
+                        Manifest = _lazyReader.Manifest;
+                        IsLoaded = true;
+
+                        LibraryUtilities.Log($"Loaded library (lazy): {Manifest.libraryName} ({Manifest.GetAssetCount()} assets)");
+                        return true;
+                    }
+                    else
+                    {
+                        LibraryUtilities.LogWarning("Lazy loading failed, falling back to extraction-based loading");
+                    }
+                }
+
+                // Fallback: Traditional extraction-based loading
                 ExtractedPath = UnityLibFileHandler.ExtractLibrary(libraryPath);
                 if (string.IsNullOrEmpty(ExtractedPath))
                 {
@@ -79,7 +105,7 @@ namespace CPAL
                 LibraryPath = libraryPath;
                 IsLoaded = true;
 
-                LibraryUtilities.Log($"Loaded library: {Manifest.libraryName} ({Manifest.GetAssetCount()} assets)");
+                LibraryUtilities.Log($"Loaded library (extracted): {Manifest.libraryName} ({Manifest.GetAssetCount()} assets)");
                 return true;
             }
             catch (Exception ex)
@@ -96,6 +122,14 @@ namespace CPAL
         {
             try
             {
+                // Dispose lazy reader if in use
+                if (_lazyReader != null)
+                {
+                    _lazyReader.Dispose();
+                    _lazyReader = null;
+                }
+
+                // Delete extracted directory if in use
                 if (!string.IsNullOrEmpty(ExtractedPath) && Directory.Exists(ExtractedPath))
                 {
                     UnityLibFileHandler.DeleteTemporaryDirectory(ExtractedPath);
@@ -244,6 +278,7 @@ namespace CPAL
         /// <summary>
         /// Get the thumbnail image bytes for an asset.
         /// Returns null if thumbnail doesn't exist.
+        /// Works with both lazy and extracted-based loading.
         /// </summary>
         public byte[] GetAssetThumbnail(AssetMetadata asset)
         {
@@ -252,11 +287,19 @@ namespace CPAL
                 return null;
             }
 
+            // Use lazy reader if available
+            if (_lazyReader != null)
+            {
+                return _lazyReader.ReadFile(asset.thumbnailPath);
+            }
+
+            // Fall back to extracted path
             return UnityLibFileHandler.ReadFileFromLibrary(ExtractedPath, asset.thumbnailPath);
         }
 
         /// <summary>
         /// Get the file bytes for an asset from the library.
+        /// Works with both lazy and extracted-based loading.
         /// </summary>
         public byte[] GetAssetFile(AssetMetadata asset)
         {
@@ -265,6 +308,13 @@ namespace CPAL
                 return null;
             }
 
+            // Use lazy reader if available
+            if (_lazyReader != null)
+            {
+                return _lazyReader.ReadFile(asset.relativePath);
+            }
+
+            // Fall back to extracted path
             return UnityLibFileHandler.ReadFileFromLibrary(ExtractedPath, asset.relativePath);
         }
 

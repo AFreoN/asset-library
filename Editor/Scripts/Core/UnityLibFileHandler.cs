@@ -123,7 +123,7 @@ namespace CPAL
         /// <summary>
         /// Compress a directory into a .unitylib file.
         /// </summary>
-        public static bool CompressLibrary(string sourceDirectory, string outputLibraryPath)
+        public static bool CompressLibrary(string sourceDirectory, string outputLibraryPath, System.IO.Compression.CompressionLevel compressionLevel = System.IO.Compression.CompressionLevel.Optimal)
         {
             try
             {
@@ -140,10 +140,10 @@ namespace CPAL
                     File.Delete(outputLibraryPath);
                 }
 
-                // Create ZIP archive
-                ZipFile.CreateFromDirectory(sourceDirectory, outputLibraryPath, System.IO.Compression.CompressionLevel.Optimal, includeBaseDirectory: false);
+                // Create ZIP archive with specified compression level
+                ZipFile.CreateFromDirectory(sourceDirectory, outputLibraryPath, compressionLevel, includeBaseDirectory: false);
 
-                LibraryUtilities.Log($"Successfully compressed library to: {outputLibraryPath}");
+                LibraryUtilities.Log($"Successfully compressed library to: {outputLibraryPath} (Level: {compressionLevel})");
                 return true;
             }
             catch (Exception ex)

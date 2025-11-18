@@ -79,8 +79,8 @@ namespace CPAL
                     return false;
                 }
 
-                // Recompress library
-                if (!UnityLibFileHandler.CompressLibrary(extractedPath, libraryPath))
+                // Recompress library with Fastest compression (for incremental updates, speed is more important than compression ratio)
+                if (!UnityLibFileHandler.CompressLibrary(extractedPath, libraryPath, System.IO.Compression.CompressionLevel.Fastest))
                 {
                     LibraryUtilities.LogError("Failed to recompress library");
                     return false;
