@@ -55,12 +55,9 @@ ExportedObj/
 *.opendb
 *.VC.db
 
-# Unity3D generated meta files - EXCEPTION: Keep .meta files for the package itself
-# Only ignore root-level meta files (documentation, config)
-*.md.meta
-*.txt.meta
-*.json.meta
-package.json.meta
+# Unity3D generated meta files
+# KEEP ALL .meta files in this package for proper distribution
+# (They are required for immutable folder asset recognition)
 
 # Unity3D generated file on crash reports
 sysinfo.txt
