@@ -55,9 +55,47 @@ A production-ready Unity Editor extension that provides a personal cross-project
 
 ## Installation
 
-1. Clone or download the package into your project's `Assets/Packages/` folder
-2. Restart Unity
-3. Access the tool via `Window → Asset Library` menu
+Choose one of the three installation methods:
+
+### Method 1: Git URL (Recommended for Development)
+
+Add to your Unity project's `Packages/manifest.json`:
+
+**Latest version:**
+```json
+{
+  "dependencies": {
+    "com.crossproject.assetlibrary": "https://github.com/AFreoN/asset-library.git"
+  }
+}
+```
+
+**Specific version:**
+```json
+{
+  "dependencies": {
+    "com.crossproject.assetlibrary": "https://github.com/AFreoN/asset-library.git#v1.0.0"
+  }
+}
+```
+
+### Method 2: Download and Extract
+
+1. Go to [GitHub Releases](https://github.com/AFreoN/asset-library/releases)
+2. Download the latest source code (ZIP)
+3. Extract to your project's `Assets/Packages/com.crossproject.assetlibrary/` folder
+
+### Method 3: Clone Repository
+
+```bash
+git clone https://github.com/AFreoN/asset-library.git Assets/Packages/com.crossproject.assetlibrary
+```
+
+### After Installation
+
+1. Restart Unity
+2. Access the tool via `Window → Asset Library` menu
+3. You're ready to start managing your asset library!
 
 ## Quick Start
 
