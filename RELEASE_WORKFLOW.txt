@@ -1,0 +1,162 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║           CROSS PROJECT ASSET LIBRARY - RELEASE WORKFLOW                   ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+AUTOMATED GITHUB RELEASE PROCESS
+─────────────────────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────┐
+│ 1. UPDATE VERSION IN CODE        │
+└──────────────────────────────────┘
+   ↓
+   Edit: Assets/Packages/com.crossproject.assetlibrary/package.json
+   Change: "version": "0.2.0"
+
+┌──────────────────────────────────┐
+│ 2. UPDATE CHANGELOG              │
+└──────────────────────────────────┘
+   ↓
+   Edit: Assets/Packages/com.crossproject.assetlibrary/CHANGELOG.md
+   Add section at top:
+   
+   ## [0.2.0] - 2025-01-15
+   ### Added
+   - Feature 1
+   ### Fixed
+   - Bug 1
+
+┌──────────────────────────────────┐
+│ 3. COMMIT TO MAIN BRANCH         │
+└──────────────────────────────────┘
+   ↓
+   $ git add package.json CHANGELOG.md
+   $ git commit -m "Release v0.2.0"
+   $ git push origin main
+
+┌──────────────────────────────────┐
+│ 4. CREATE AND PUSH GIT TAG       │
+└──────────────────────────────────┘
+   ↓
+   $ git tag -a v0.2.0 -m "Release version 0.2.0"
+   $ git push origin v0.2.0
+
+┌──────────────────────────────────┐
+│ 5. GITHUB ACTIONS WORKFLOW       │ ← AUTOMATIC!
+│    • Detects tag pushed          │
+│    • Parses CHANGELOG.md         │
+│    • Creates GitHub Release      │
+└──────────────────────────────────┘
+   ↓
+┌──────────────────────────────────┐
+│ 6. RELEASE AVAILABLE             │
+│ github.com/AFreoN/asset-library/ │
+│              releases             │
+└──────────────────────────────────┘
+
+
+VERSIONING EXAMPLES
+─────────────────────────────────────────────────────────────────────────────
+
+Current: 0.1.0 (MVP with basic features)
+↓
+Next Options:
+  • 0.2.0 (MINOR) - Add new features, backward compatible
+  • 1.0.0 (MAJOR) - Major release, stable version
+  • 0.1.1 (PATCH) - Only bug fixes
+
+
+USER INSTALLATION WORKFLOW
+─────────────────────────────────────────────────────────────────────────────
+
+User opens their Unity project
+
+   ↓
+
+Option 1: Git URL (Recommended)
+   Packages/manifest.json:
+   {
+     "dependencies": {
+       "com.crossproject.assetlibrary": "https://github.com/AFreoN/asset-library.git#v0.2.0"
+     }
+   }
+
+Option 2: Download Release
+   github.com/AFreoN/asset-library/releases
+   → Download source code ZIP
+   → Extract to Assets/Packages/com.crossproject.assetlibrary/
+
+Option 3: Clone Repository
+   $ git clone https://github.com/AFreoN/asset-library.git \
+     Assets/Packages/com.crossproject.assetlibrary
+
+
+TROUBLESHOOTING
+─────────────────────────────────────────────────────────────────────────────
+
+Q: Release didn't appear
+A: Check GitHub Actions tab in repository for failed workflows
+   Verify tag format: git tag -l
+
+Q: Changelog not in release
+A: Verify CHANGELOG.md section matches version exactly
+   ## [0.2.0] - YYYY-MM-DD
+
+Q: Need to delete/redo release
+A: $ git tag -d v0.2.0
+   $ git push origin :refs/tags/v0.2.0
+   $ git tag -a v0.2.0 -m "Release version 0.2.0"
+   $ git push origin v0.2.0
+
+
+QUICK REFERENCE COMMANDS
+─────────────────────────────────────────────────────────────────────────────
+
+View local tags:
+  $ git tag -l
+
+View remote tags:
+  $ git tag -l -r
+
+Create annotated tag:
+  $ git tag -a v0.2.0 -m "Release version 0.2.0"
+
+Push tag:
+  $ git push origin v0.2.0
+
+Push all tags:
+  $ git push origin --tags
+
+Delete local tag:
+  $ git tag -d v0.2.0
+
+Delete remote tag:
+  $ git push origin :refs/tags/v0.2.0
+
+View git log with tags:
+  $ git log --oneline --decorate
+
+
+KEY FILES
+─────────────────────────────────────────────────────────────────────────────
+
+.github/workflows/release.yml
+   ↑ GitHub Actions workflow - triggers on tag push
+
+package.json
+   ↑ Version number - must be updated before release
+
+CHANGELOG.md
+   ↑ Changelog - must have section matching version
+
+RELEASING.md
+   ↑ Detailed release process documentation
+
+QUICKSTART_RELEASE.md
+   ↑ Quick reference guide
+
+This document: RELEASE_WORKFLOW.txt
+   ↑ Visual overview of the release process
+
+═════════════════════════════════════════════════════════════════════════════
+Everything is set up and ready. You can make your first release anytime!
+═════════════════════════════════════════════════════════════════════════════
