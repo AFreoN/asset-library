@@ -5,9 +5,17 @@
   "version": "1.0.0",
   "unity": "2020.3",
   "author": {
-    "name": "CPAM"
+    "name": "AFreoN",
+    "url": "https://github.com/AFreoN"
   },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AFreoN/asset-library.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AFreoN/asset-library/issues"
+  },
   "keywords": [
     "asset",
     "library",
