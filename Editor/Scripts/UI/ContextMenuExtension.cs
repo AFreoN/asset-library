@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace CPAM
+namespace CPAL
 {
     /// <summary>
     /// Adds context menu items to the Project window for adding assets to the library.

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace CPAM
+namespace CPAL
 {
     /// <summary>
     /// Modal dialog for adding assets to a library.
@@ -23,7 +23,7 @@ namespace CPAM
 
         private const float WindowWidth = 500f;
         private const float WindowHeight = 600f;
-        private const string LastLibraryPathKey = "CPAM.LastLibraryPathForAdd";
+        private const string LastLibraryPathKey = "CPAL.LastLibraryPathForAdd";
 
         private void OnEnable()
         {

@@ -5,7 +5,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace CPAM
+namespace CPAL
 {
     /// <summary>
     /// Manages the right-click context menu for assets in the Asset Library window.
@@ -70,7 +70,7 @@ namespace CPAM
                 }
 
                 // Create temp file
-                var tempDir = Path.Combine(Path.GetTempPath(), "CPAM_Open", System.Guid.NewGuid().ToString());
+                var tempDir = Path.Combine(Path.GetTempPath(), "CPAL_Open", System.Guid.NewGuid().ToString());
                 Directory.CreateDirectory(tempDir);
 
                 var fileName = Path.GetFileName(asset.relativePath);

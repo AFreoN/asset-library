@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace CPAM
+namespace CPAL
 {
     /// <summary>
     /// Handles drag and drop operations from the asset library window to the project.

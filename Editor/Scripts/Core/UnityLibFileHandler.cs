@@ -5,7 +5,7 @@ using System.IO.Compression;
 using System.Text;
 using UnityEngine;
 
-namespace CPAM
+namespace CPAL
 {
     /// <summary>
     /// Handles all operations on .unitylib files (ZIP-based archives).

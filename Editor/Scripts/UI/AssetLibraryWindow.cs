@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace CPAM
+namespace CPAL
 {
     /// <summary>
     /// Main editor window for browsing and importing assets from the library.
@@ -82,8 +82,8 @@ namespace CPAM
             _thumbnailCache = new Dictionary<string, Texture2D>();
 
             // Load last used library path from preferences
-            _libraryPath = EditorPrefs.GetString("CPAM.LastLibraryPath", "");
-            _autoReload = EditorPrefs.GetBool("CPAM.AutoReload", false);
+            _libraryPath = EditorPrefs.GetString("CPAL.LastLibraryPath", "");
+            _autoReload = EditorPrefs.GetBool("CPAL.AutoReload", false);
 
             if (!string.IsNullOrEmpty(_libraryPath) && LibraryUtilities.IsValidLibraryFile(_libraryPath))
             {
@@ -191,7 +191,7 @@ namespace CPAM
             if (newAutoReload != _autoReload)
             {
                 _autoReload = newAutoReload;
-                EditorPrefs.SetBool("CPAM.AutoReload", _autoReload);
+                EditorPrefs.SetBool("CPAL.AutoReload", _autoReload);
                 SetupFileWatcher();
             }
 
@@ -665,7 +665,7 @@ namespace CPAM
             {
                 if (_loader.LoadLibrary(libraryPath))
                 {
-                    EditorPrefs.SetString("CPAM.LastLibraryPath", libraryPath);
+                    EditorPrefs.SetString("CPAL.LastLibraryPath", libraryPath);
                     _selectedAssetIds.Clear();
                     RefreshDisplayedAssets();
                     EditorUtility.DisplayProgressBar("Loading Library", "Loading thumbnails...", 0.8f);
@@ -809,7 +809,7 @@ namespace CPAM
                 // Create a unique temp directory for this drag operation
                 _currentDragTempDir = Path.Combine(
                     Path.GetTempPath(),
-                    "CPAM_DragDrop",
+                    "CPAL_DragDrop",
                     System.Guid.NewGuid().ToString()
                 );
 

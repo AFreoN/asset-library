@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace CPAM
+namespace CPAL
 {
     /// <summary>
     /// Manages recently used libraries with metadata caching.
@@ -14,9 +14,9 @@ namespace CPAM
     /// </summary>
     public class RecentLibrariesManager
     {
-        private const string RECENT_LIBRARIES_KEY = "CPAM.RecentLibrariesList";
-        private const string METADATA_CACHE_KEY = "CPAM.LibraryMetadataCache";
-        private const string LEGACY_LAST_LIBRARY_KEY = "CPAM.LastLibraryPath";
+        private const string RECENT_LIBRARIES_KEY = "CPAL.RecentLibrariesList";
+        private const string METADATA_CACHE_KEY = "CPAL.LibraryMetadataCache";
+        private const string LEGACY_LAST_LIBRARY_KEY = "CPAL.LastLibraryPath";
 
         [System.Serializable]
         public class LibraryMetadata

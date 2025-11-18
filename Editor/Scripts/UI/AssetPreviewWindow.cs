@@ -2,7 +2,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace CPAM
+namespace CPAL
 {
     /// <summary>
     /// EditorWindow for previewing assets from the library.
@@ -204,7 +204,7 @@ namespace CPAM
                 }
 
                 // Extract mesh to temp Assets folder for loading
-                string tempAssetsPath = "Assets/CPAM_TempMeshes";
+                string tempAssetsPath = "Assets/CPAL_TempMeshes";
                 if (!System.IO.Directory.Exists(tempAssetsPath))
                 {
                     System.IO.Directory.CreateDirectory(tempAssetsPath);
@@ -321,7 +321,7 @@ namespace CPAM
                 }
 
                 // Extract audio to temp Assets folder for loading
-                string tempAssetsPath = "Assets/CPAM_TempAudio";
+                string tempAssetsPath = "Assets/CPAL_TempAudio";
                 if (!System.IO.Directory.Exists(tempAssetsPath))
                 {
                     System.IO.Directory.CreateDirectory(tempAssetsPath);
@@ -463,7 +463,7 @@ namespace CPAM
                 }
 
                 // Extract material to temp Assets folder for loading
-                string tempAssetsPath = "Assets/CPAM_TempMaterials";
+                string tempAssetsPath = "Assets/CPAL_TempMaterials";
                 if (!System.IO.Directory.Exists(tempAssetsPath))
                 {
                     System.IO.Directory.CreateDirectory(tempAssetsPath);
@@ -775,21 +775,21 @@ namespace CPAM
             // Clean up temporary folders
             try
             {
-                string tempMeshPath = "Assets/CPAM_TempMeshes";
+                string tempMeshPath = "Assets/CPAL_TempMeshes";
                 if (System.IO.Directory.Exists(tempMeshPath))
                 {
                     System.IO.Directory.Delete(tempMeshPath, true);
                     System.IO.File.Delete(tempMeshPath + ".meta");
                 }
 
-                string tempMaterialPath = "Assets/CPAM_TempMaterials";
+                string tempMaterialPath = "Assets/CPAL_TempMaterials";
                 if (System.IO.Directory.Exists(tempMaterialPath))
                 {
                     System.IO.Directory.Delete(tempMaterialPath, true);
                     System.IO.File.Delete(tempMaterialPath + ".meta");
                 }
 
-                string tempAudioPath = "Assets/CPAM_TempAudio";
+                string tempAudioPath = "Assets/CPAL_TempAudio";
                 if (System.IO.Directory.Exists(tempAudioPath))
                 {
                     System.IO.Directory.Delete(tempAudioPath, true);

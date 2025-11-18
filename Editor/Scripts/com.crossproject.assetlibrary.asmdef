@@ -1,6 +1,6 @@
 {
   "name": "com.crossproject.assetlibrary",
-  "rootNamespace": "CPAM",
+  "rootNamespace": "CPAL",
   "references": [],
   "includePlatforms": [
     "Editor"

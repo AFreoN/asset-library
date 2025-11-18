@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace CPAM
+namespace CPAL
 {
     /// <summary>
     /// Utility class providing helper functions for library operations.
@@ -186,7 +186,7 @@ namespace CPAM
         /// </summary>
         public static string GetLibraryCacheDirectory()
         {
-            var cachePath = Path.Combine(Application.temporaryCachePath, "CPAM", "LibraryCache");
+            var cachePath = Path.Combine(Application.temporaryCachePath, "CPAL", "LibraryCache");
             if (!Directory.Exists(cachePath))
             {
                 Directory.CreateDirectory(cachePath);
@@ -216,7 +216,7 @@ namespace CPAM
         /// </summary>
         public static void LogError(string message)
         {
-            Debug.LogError($"[CPAM] {message}");
+            Debug.LogError($"[CPAL] {message}");
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace CPAM
         /// </summary>
         public static void LogWarning(string message)
         {
-            Debug.LogWarning($"[CPAM] {message}");
+            Debug.LogWarning($"[CPAL] {message}");
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace CPAM
         /// </summary>
         public static void Log(string message)
         {
-            Debug.Log($"[CPAM] {message}");
+            Debug.Log($"[CPAL] {message}");
         }
 
         /// <summary>

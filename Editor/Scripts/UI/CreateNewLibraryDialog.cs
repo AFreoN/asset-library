@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace CPAM
+namespace CPAL
 {
     /// <summary>
     /// Dialog for creating a new asset library.

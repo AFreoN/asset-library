@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace CPAM
+namespace CPAL
 {
     /// <summary>
     /// Handles importing assets from the library into the current project.
@@ -116,7 +116,7 @@ namespace CPAM
         private static string GetImportDestination()
         {
             // Try to get saved preference
-            var savedPath = EditorPrefs.GetString("CPAM.ImportPath", DefaultImportFolder);
+            var savedPath = EditorPrefs.GetString("CPAL.ImportPath", DefaultImportFolder);
 
             // Show folder selection dialog
             var path = EditorUtility.SaveFolderPanel(
@@ -138,7 +138,7 @@ namespace CPAM
             }
 
             // Save preference
-            EditorPrefs.SetString("CPAM.ImportPath", path);
+            EditorPrefs.SetString("CPAL.ImportPath", path);
 
             return path;
         }

@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace CPAM
+namespace CPAL
 {
     /// <summary>
     /// Provides methods for safely editing and modifying library contents.

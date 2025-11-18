@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace CPAM
+namespace CPAL
 {
     /// <summary>
     /// Modal dialog displaying read-only asset properties.
