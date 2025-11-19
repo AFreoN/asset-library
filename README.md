@@ -3,7 +3,7 @@
 A production-ready Unity Editor extension that provides a personal cross-project asset library, allowing developers to quickly import frequently used assets without manual folder navigation.
 
 **Package ID**: `com.crossproject.assetlibrary`
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Minimum Unity**: 2020.3 LTS
 
 ## Core Features

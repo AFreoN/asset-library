@@ -2,7 +2,7 @@
   "name": "com.crossproject.assetlibrary",
   "displayName": "Cross Project Asset Library",
   "description": "A Unity Editor extension that provides a personal cross-project asset library, allowing developers to quickly import frequently used assets without manual folder navigation.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "unity": "2020.3",
   "author": {
     "name": "AFreoN",
