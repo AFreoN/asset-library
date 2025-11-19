@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Library loading time dramatically reduced (20-100x faster for large libraries)
 - Eliminated UI stuttering when opening libraries with many assets
 - Asset addition operations now significantly faster (75-80% improvement)
+- Create New Library dialog now properly handles file browser, closes after creation, and automatically loads the new library
 
 ### Performance Improvements
 

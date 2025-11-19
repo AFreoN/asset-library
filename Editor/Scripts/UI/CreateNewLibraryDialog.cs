@@ -17,15 +17,22 @@ namespace CPAL
         private const float WindowHeight = 200f;
 
         /// <summary>
+        /// Callback when a new library is created.
+        /// </summary>
+        public delegate void OnLibraryCreatedDelegate(string libraryPath);
+        private static OnLibraryCreatedDelegate _onLibraryCreated;
+
+        /// <summary>
         /// Show the create new library dialog.
         /// </summary>
-        public static void ShowDialog()
+        public static void ShowDialog(OnLibraryCreatedDelegate onLibraryCreated = null)
         {
             if (_instance != null)
             {
                 _instance.Close();
             }
 
+            _onLibraryCreated = onLibraryCreated;
             _instance = CreateInstance<CreateNewLibraryDialog>();
             _instance.minSize = new Vector2(WindowWidth, 150);
             _instance.maxSize = new Vector2(WindowWidth + 50, 300);
@@ -36,7 +43,9 @@ namespace CPAL
             var y = (rect.height - WindowHeight) / 2 + rect.y;
             _instance.position = new Rect(x, y, WindowWidth, WindowHeight);
 
-            _instance.ShowModal();
+            // Use Show() instead of ShowModal() to allow SaveFilePanel to work properly
+            // Modal windows have restrictions on nested dialogs like file panels
+            _instance.Show();
         }
 
         private void OnGUI()
@@ -99,8 +108,23 @@ namespace CPAL
                 if (LibraryWriter.CreateNewLibrary(_libraryPath, _libraryName))
                 {
                     EditorUtility.ClearProgressBar();
-                    EditorUtility.DisplayDialog("Success", $"Library created at:\n{_libraryPath}", "OK");
-                    Close();
+
+                    // Store the path before deferring
+                    string createdLibraryPath = _libraryPath;
+
+                    // Defer window close and callback to next frame to prevent layout group conflicts
+                    // This prevents issues when modal dialogs interact during the same GUI event processing cycle
+                    EditorApplication.delayCall += () =>
+                    {
+                        // Close the dialog
+                        Close();
+
+                        // Invoke the callback to notify the caller (AssetLibraryWindow) to load the new library
+                        _onLibraryCreated?.Invoke(createdLibraryPath);
+
+                        // Show success message after dialog is closed and callback invoked
+                        EditorUtility.DisplayDialog("Success", $"Library created at:\n{createdLibraryPath}", "OK");
+                    };
                 }
                 else
                 {

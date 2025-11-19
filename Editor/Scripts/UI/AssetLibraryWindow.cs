@@ -186,7 +186,7 @@ namespace CPAL
 
             if (GUILayout.Button("Create New", EditorStyles.toolbarButton, GUILayout.Width(80)))
             {
-                CreateNewLibraryDialog.ShowDialog();
+                CreateNewLibraryDialog.ShowDialog(OnLibraryCreated);
             }
 
             if (GUILayout.Button("Show All", EditorStyles.toolbarButton, GUILayout.Width(70)))
@@ -236,7 +236,7 @@ namespace CPAL
 
             if (GUILayout.Button("Create New Library", GUILayout.Height(40)))
             {
-                CreateNewLibraryDialog.ShowDialog();
+                CreateNewLibraryDialog.ShowDialog(OnLibraryCreated);
             }
         }
 
@@ -763,6 +763,15 @@ namespace CPAL
         /// Callback when a library is selected from the Recent Libraries dialog.
         /// </summary>
         private void OnRecentLibrarySelected(string libraryPath)
+        {
+            _libraryPath = libraryPath;
+            LoadLibrary(libraryPath);
+        }
+
+        /// <summary>
+        /// Callback when a new library is created from the Create New Library dialog.
+        /// </summary>
+        private void OnLibraryCreated(string libraryPath)
         {
             _libraryPath = libraryPath;
             LoadLibrary(libraryPath);
