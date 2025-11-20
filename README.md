@@ -3,7 +3,7 @@
 A production-ready Unity Editor extension that provides a personal cross-project asset library, allowing developers to quickly import frequently used assets without manual folder navigation.
 
 **Package ID**: `com.crossproject.assetlibrary`
-**Version**: 1.1.0
+**Version**: 1.1.1
 **Minimum Unity**: 2020.3 LTS
 
 ## Core Features
@@ -164,17 +164,35 @@ MyLibrary.unitylib
 └── thumbnails/            # Custom thumbnail images
 ```
 
-## Preferences
+## Preferences & Settings
+
+### UI Controls
+
+The Asset Library window toolbar includes several toggles:
+
+- **Auto Reload**: Automatically reload the library when external changes are detected
+- **Debug Log**: Enable/disable debug logging output to the Unity console (disabled by default for production)
+
+### EditorPrefs Keys
 
 The tool stores the following preferences (accessible via `EditorPrefs`):
 
-- `CPAM.LastLibraryPath`: Path to the last opened library
-- `CPAM.DefaultImportPath`: Default folder for importing assets
-- `CPAM.WindowPosition`: Window position and size
+- `CPAL.LastLibraryPath`: Path to the last opened library
+- `CPAL.DefaultImportPath`: Default folder for importing assets
+- `CPAL.WindowPosition`: Window position and size
+- `CPAL.AutoReload`: Auto-reload setting state
+- `CPAL.DebugLoggingEnabled`: Debug logging toggle state
+- `CPAM.RecentLibraries`: Recent libraries list for quick access
+
+## Recent Improvements (v1.1.1)
+
+- **File Lock Issues Fixed**: Resolved file locking problems when adding and deleting files from libraries
+- **Debug Logging Control**: New toggle in the Asset Library window toolbar to enable/disable debug logging (disabled by default for clean production console)
+- **Performance Optimizations**: Improved file handle management in ZIP operations with better resource cleanup
 
 ## Current Limitations
 
-The current version (1.0.0) does NOT support:
+The current version (1.1.1) does NOT support:
 
 - ❌ Cloud sync or remote storage
 - ❌ Team collaboration features
@@ -237,6 +255,6 @@ For issues, questions, or suggestions, please refer to the project repository or
 
 ---
 
-**Version**: 1.0.0
+**Version**: 1.1.1
 **Unity Version**: 2020.3 LTS and newer
 **Platform Support**: Windows, macOS, Linux (Editor only)

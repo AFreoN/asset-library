@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEditor;
 
 namespace CPAL
 {
@@ -10,6 +11,37 @@ namespace CPAL
     /// </summary>
     public static class LibraryUtilities
     {
+        /// <summary>
+        /// EditorPrefs key for debug logging flag.
+        /// </summary>
+        private const string DEBUG_LOGGING_KEY = "CPAL.DebugLoggingEnabled";
+
+        /// <summary>
+        /// Flag to control whether logging is enabled (disabled by default).
+        /// </summary>
+        private static bool? _debugLoggingEnabled;
+
+        /// <summary>
+        /// Get or set the debug logging enabled state.
+        /// Value is persisted in EditorPrefs.
+        /// </summary>
+        public static bool DebugLoggingEnabled
+        {
+            get
+            {
+                if (!_debugLoggingEnabled.HasValue)
+                {
+                    _debugLoggingEnabled = EditorPrefs.GetBool(DEBUG_LOGGING_KEY, false);
+                }
+                return _debugLoggingEnabled.Value;
+            }
+            set
+            {
+                _debugLoggingEnabled = value;
+                EditorPrefs.SetBool(DEBUG_LOGGING_KEY, value);
+            }
+        }
+
         /// <summary>
         /// Map of asset types to their category folders.
         /// </summary>
@@ -212,27 +244,36 @@ namespace CPAL
         }
 
         /// <summary>
-        /// Log an error message to Unity console.
+        /// Log an error message to Unity console (only if debug logging is enabled).
         /// </summary>
         public static void LogError(string message)
         {
-            Debug.LogError($"[CPAL] {message}");
+            if (DebugLoggingEnabled)
+            {
+                Debug.LogError($"[CPAL] {message}");
+            }
         }
 
         /// <summary>
-        /// Log a warning message to Unity console.
+        /// Log a warning message to Unity console (only if debug logging is enabled).
         /// </summary>
         public static void LogWarning(string message)
         {
-            Debug.LogWarning($"[CPAL] {message}");
+            if (DebugLoggingEnabled)
+            {
+                Debug.LogWarning($"[CPAL] {message}");
+            }
         }
 
         /// <summary>
-        /// Log an info message to Unity console.
+        /// Log an info message to Unity console (only if debug logging is enabled).
         /// </summary>
         public static void Log(string message)
         {
-            Debug.Log($"[CPAL] {message}");
+            if (DebugLoggingEnabled)
+            {
+                Debug.Log($"[CPAL] {message}");
+            }
         }
 
         /// <summary>

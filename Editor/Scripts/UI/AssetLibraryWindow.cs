@@ -221,6 +221,15 @@ namespace CPAL
                 SetupFileWatcher();
             }
 
+            EditorGUILayout.Separator();
+
+            EditorGUILayout.LabelField("Debug Log:", GUILayout.Width(75));
+            var newDebugLogging = EditorGUILayout.Toggle(LibraryUtilities.DebugLoggingEnabled, GUILayout.Width(20));
+            if (newDebugLogging != LibraryUtilities.DebugLoggingEnabled)
+            {
+                LibraryUtilities.DebugLoggingEnabled = newDebugLogging;
+            }
+
             EditorGUILayout.EndHorizontal();
         }
 

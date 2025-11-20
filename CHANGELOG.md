@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2025-11-20
+
+### Added
+
+- **Debug Logging Control**:
+  - New `DebugLoggingEnabled` static property in `LibraryUtilities`
+  - Debug messages can be toggled on/off via UI toggle in Asset Library window
+  - Setting persists across editor sessions using EditorPrefs
+  - Disabled by default for clean production console output
+
+### Fixed
+
+- **File Lock Issues**: Resolved file locking problems when adding and deleting files from library
+  - Improved file handle management in ZIP operations
+  - Better resource cleanup after library modifications
+
+### Changed
+
+- All logging methods (`Log`, `LogWarning`, `LogError`) now respect debug logging setting
+- Console remains clean in production builds unless debug logging is explicitly enabled
+
 ## [1.1.0] - 2025-11-18
 
 ### Added

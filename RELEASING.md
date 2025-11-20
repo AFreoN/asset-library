@@ -32,7 +32,7 @@ The project uses [Semantic Versioning](https://semver.org/) (MAJOR.MINOR.PATCH):
 - **MINOR**: New features (backward compatible)
 - **PATCH**: Bug fixes and small improvements
 
-**Current Version**: 1.0.0
+**Current Version**: 1.1.1
 **Next Release**: Determine based on changes
 
 ---
