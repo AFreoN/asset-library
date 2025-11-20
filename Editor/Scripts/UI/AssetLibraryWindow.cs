@@ -96,6 +96,10 @@ namespace CPAL
             _cachedTagsList = new List<string> { "All Tags" };
             _cachedGroupsList = new List<string> { "All Groups" };
 
+            // Subscribe to library modification events
+            LibraryWriter.OnLibraryBeingModified += OnLibraryBeingModified;
+            LibraryWriter.OnLibraryModified += OnLibraryModified;
+
             // Load last used library path from preferences
             _libraryPath = EditorPrefs.GetString("CPAL.LastLibraryPath", "");
             _autoReload = EditorPrefs.GetBool("CPAL.AutoReload", false);
@@ -108,6 +112,10 @@ namespace CPAL
 
         private void OnDisable()
         {
+            // Unsubscribe from library modification events
+            LibraryWriter.OnLibraryBeingModified -= OnLibraryBeingModified;
+            LibraryWriter.OnLibraryModified -= OnLibraryModified;
+
             if (_loader != null)
             {
                 _loader.Dispose();
@@ -775,6 +783,36 @@ namespace CPAL
         {
             _libraryPath = libraryPath;
             LoadLibrary(libraryPath);
+        }
+
+        /// <summary>
+        /// Callback invoked before a library is being modified.
+        /// Unloads the library if it's currently open to release file locks.
+        /// </summary>
+        private void OnLibraryBeingModified(string libraryPath)
+        {
+            // Only unload if the library being modified is the one currently open
+            if (_loader.IsLoaded && _loader.LibraryPath == libraryPath)
+            {
+                LibraryUtilities.Log($"Unloading library before modification: {libraryPath}");
+                _loader.UnloadLibrary();
+                _displayedAssets.Clear();
+                _selectedAssetIds.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Callback invoked after a library has been modified.
+        /// Reloads the library to show updated content.
+        /// </summary>
+        private void OnLibraryModified(string libraryPath)
+        {
+            // Reload the library to show updated content
+            if (!string.IsNullOrEmpty(_libraryPath) && _libraryPath == libraryPath)
+            {
+                LibraryUtilities.Log($"Reloading library after modification: {libraryPath}");
+                LoadLibrary(libraryPath);
+            }
         }
 
         private void SetupFileWatcher()

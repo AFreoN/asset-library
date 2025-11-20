@@ -137,7 +137,57 @@ namespace CPAL
                 // Remove existing file if it exists
                 if (File.Exists(outputLibraryPath))
                 {
-                    File.Delete(outputLibraryPath);
+                    try
+                    {
+                        File.Delete(outputLibraryPath);
+                    }
+                    catch (IOException ex)
+                    {
+                        LibraryUtilities.LogWarning($"Failed to delete existing library file (file locked): {ex.Message}");
+                        LibraryUtilities.LogWarning("Attempting to use temporary file and replace...");
+
+                        // Try alternative approach: create to temp file first, then replace
+                        string tempOutputPath = outputLibraryPath + ".tmp";
+                        if (File.Exists(tempOutputPath))
+                        {
+                            File.Delete(tempOutputPath);
+                        }
+
+                        ZipFile.CreateFromDirectory(sourceDirectory, tempOutputPath, compressionLevel, includeBaseDirectory: false);
+
+                        // Try to replace the original file
+                        int maxRetries = 5;
+                        int retryCount = 0;
+                        while (retryCount < maxRetries)
+                        {
+                            try
+                            {
+                                if (File.Exists(outputLibraryPath))
+                                {
+                                    File.Delete(outputLibraryPath);
+                                }
+                                File.Move(tempOutputPath, outputLibraryPath);
+                                LibraryUtilities.Log($"Successfully compressed library to: {outputLibraryPath} (Level: {compressionLevel})");
+                                return true;
+                            }
+                            catch (IOException)
+                            {
+                                retryCount++;
+                                if (retryCount < maxRetries)
+                                {
+                                    System.Threading.Thread.Sleep(100); // Wait before retry
+                                }
+                            }
+                        }
+
+                        // If replacement failed, clean up temp file
+                        if (File.Exists(tempOutputPath))
+                        {
+                            File.Delete(tempOutputPath);
+                        }
+
+                        throw ex;
+                    }
                 }
 
                 // Create ZIP archive with specified compression level

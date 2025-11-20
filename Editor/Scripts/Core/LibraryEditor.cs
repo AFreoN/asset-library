@@ -29,6 +29,10 @@ namespace CPAL
                     return false;
                 }
 
+                // Notify listeners that we're about to modify the library
+                // This allows AssetLibraryWindow to unload the library and release file locks
+                LibraryWriter.NotifyLibraryBeingModified(libraryPath);
+
                 // Extract library
                 extractedPath = UnityLibFileHandler.ExtractLibrary(libraryPath);
                 if (string.IsNullOrEmpty(extractedPath))
@@ -104,6 +108,11 @@ namespace CPAL
                 }
 
                 LibraryUtilities.Log($"Successfully deleted asset '{assetToDelete.name}' (ID: {assetId}) from library");
+
+                // Notify listeners that library has been modified
+                // This allows AssetLibraryWindow to reload the library
+                LibraryWriter.NotifyLibraryModified(libraryPath);
+
                 return true;
             }
             catch (Exception ex)
@@ -139,6 +148,10 @@ namespace CPAL
                     LibraryUtilities.LogError($"Invalid library file: {libraryPath}");
                     return false;
                 }
+
+                // Notify listeners that we're about to modify the library
+                // This allows AssetLibraryWindow to unload the library and release file locks
+                LibraryWriter.NotifyLibraryBeingModified(libraryPath);
 
                 // Extract library
                 extractedPath = UnityLibFileHandler.ExtractLibrary(libraryPath);
@@ -188,6 +201,11 @@ namespace CPAL
                 }
 
                 LibraryUtilities.Log($"Successfully updated metadata for asset '{updatedMetadata.name}' (ID: {assetId})");
+
+                // Notify listeners that library has been modified
+                // This allows AssetLibraryWindow to reload the library
+                LibraryWriter.NotifyLibraryModified(libraryPath);
+
                 return true;
             }
             catch (Exception ex)
@@ -229,6 +247,10 @@ namespace CPAL
                     LibraryUtilities.LogError($"Invalid library file: {libraryPath}");
                     return false;
                 }
+
+                // Notify listeners that we're about to modify the library
+                // This allows AssetLibraryWindow to unload the library and release file locks
+                LibraryWriter.NotifyLibraryBeingModified(libraryPath);
 
                 // Extract library
                 extractedPath = UnityLibFileHandler.ExtractLibrary(libraryPath);
@@ -272,6 +294,11 @@ namespace CPAL
                 }
 
                 LibraryUtilities.Log($"Successfully renamed asset from '{oldName}' to '{newName}' (ID: {assetId})");
+
+                // Notify listeners that library has been modified
+                // This allows AssetLibraryWindow to reload the library
+                LibraryWriter.NotifyLibraryModified(libraryPath);
+
                 return true;
             }
             catch (Exception ex)

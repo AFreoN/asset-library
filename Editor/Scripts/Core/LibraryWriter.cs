@@ -27,6 +27,40 @@ namespace CPAL
         }
 
         /// <summary>
+        /// Callback for library unload/reload notifications.
+        /// Used to notify AssetLibraryWindow to unload before modifying a library file.
+        /// </summary>
+        public delegate void LibraryModificationHandler(string libraryPath);
+
+        /// <summary>
+        /// Event fired before adding assets to a library.
+        /// Subscribers should unload the library to release file locks.
+        /// </summary>
+        public static event LibraryModificationHandler OnLibraryBeingModified;
+
+        /// <summary>
+        /// Event fired after successfully adding assets to a library.
+        /// Subscribers should reload the library to show updated content.
+        /// </summary>
+        public static event LibraryModificationHandler OnLibraryModified;
+
+        /// <summary>
+        /// Internal method to notify that a library is being modified.
+        /// </summary>
+        internal static void NotifyLibraryBeingModified(string libraryPath)
+        {
+            OnLibraryBeingModified?.Invoke(libraryPath);
+        }
+
+        /// <summary>
+        /// Internal method to notify that a library has been modified.
+        /// </summary>
+        internal static void NotifyLibraryModified(string libraryPath)
+        {
+            OnLibraryModified?.Invoke(libraryPath);
+        }
+
+        /// <summary>
         /// Add one or more assets to a library.
         /// </summary>
         public static bool AddAssetsToLibrary(string libraryPath, List<AssetAddRequest> assetsToAdd)
@@ -46,6 +80,10 @@ namespace CPAL
             string extractedPath = null;
             try
             {
+                // Notify listeners that we're about to modify the library
+                // This allows AssetLibraryWindow to unload the library and release file locks
+                NotifyLibraryBeingModified(libraryPath);
+
                 // Extract library
                 extractedPath = UnityLibFileHandler.ExtractLibrary(libraryPath);
                 if (string.IsNullOrEmpty(extractedPath))
@@ -87,6 +125,11 @@ namespace CPAL
                 }
 
                 LibraryUtilities.Log($"Successfully added {assetsToAdd.Count} asset(s) to library");
+
+                // Notify listeners that library has been modified
+                // This allows AssetLibraryWindow to reload the library
+                NotifyLibraryModified(libraryPath);
+
                 return true;
             }
             catch (Exception ex)
